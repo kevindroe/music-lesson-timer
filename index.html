@@ -1,0 +1,1452 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Music Lesson Observation App</title>
+
+  <style>
+    :root{
+      --bg: #ffffff;
+      --ink: #111827;
+      --muted: #4b5563;
+      --muted2:#6b7280;
+      --stroke: rgba(17,24,39,.12);
+      --shadow: 0 10px 30px rgba(17,24,39,.10);
+      --round: 18px;
+
+      --c1: rgba(59,130,246,.12);  /* blue */
+      --c1b: rgba(59,130,246,.25);
+      --c2: rgba(245,158,11,.14);  /* amber */
+      --c2b: rgba(245,158,11,.28);
+      --c3: rgba(16,185,129,.12);  /* green */
+      --c3b: rgba(16,185,129,.26);
+      --c4: rgba(168,85,247,.12);  /* purple */
+      --c4b: rgba(168,85,247,.26);
+
+      --btn: #111827;
+      --btnInk: #ffffff;
+      --btn2: rgba(17,24,39,.06);
+      --danger: rgba(220,38,38,.10);
+      --dangerStroke: rgba(220,38,38,.25);
+      --focus: rgba(59,130,246,.25);
+    }
+
+    *{ box-sizing:border-box; }
+    html, body{ height:100%; }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:
+        radial-gradient(900px 480px at 10% 0%, rgba(59,130,246,.10), transparent 55%),
+        radial-gradient(700px 420px at 100% 12%, rgba(168,85,247,.10), transparent 55%),
+        radial-gradient(700px 520px at 30% 100%, rgba(16,185,129,.08), transparent 55%),
+        var(--bg);
+      color: var(--ink);
+      padding: 16px;
+    }
+
+    .wrap{ max-width: 1180px; margin: 0 auto; }
+
+    /* Header */
+    .top{
+      display:flex; align-items:center; justify-content:space-between; gap:14px;
+      padding: 14px;
+      border-radius: calc(var(--round) + 6px);
+      background: rgba(255,255,255,.86);
+      border: 1px solid var(--stroke);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+    }
+    .brand{ display:flex; align-items:center; gap:14px; min-width: 260px; }
+    .logo{
+      height: 58px; width: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 10px 16px rgba(17,24,39,.16));
+    }
+    h1{ margin:0; font-size: 20px; letter-spacing: .2px; }
+    .by{ margin-top: 2px; font-size: 12px; color: var(--muted); }
+    .sub{
+      margin: 10px 0 14px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    /* Layout */
+    .grid{ display:grid; grid-template-columns: 1fr; gap: 14px; margin-top: 12px; }
+    @media (min-width: 980px){ .grid{ grid-template-columns: 1.08fr .92fr; } }
+
+    .card{
+      background: rgba(255,255,255,.86);
+      border: 1px solid var(--stroke);
+      border-radius: var(--round);
+      box-shadow: var(--shadow);
+      padding: 14px;
+      backdrop-filter: blur(8px);
+    }
+
+    .row{ display:grid; grid-template-columns: 1fr; gap: 10px; }
+    @media (min-width: 980px){
+      .row.two{ grid-template-columns: 1fr 1fr; }
+      .row.three{ grid-template-columns: 1fr 1fr 1fr; }
+    }
+
+    label{ display:block; font-size: 12px; color: var(--muted); margin: 0 0 6px; }
+    input[type="text"], input[type="date"], input[type="number"], input[type="url"], select, textarea{
+      width:100%;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(17,24,39,.16);
+      background: #fff;
+      color: var(--ink);
+      outline: none;
+    }
+    textarea{ min-height: 120px; resize: vertical; }
+    input:focus, select:focus, textarea:focus{
+      border-color: rgba(59,130,246,.55);
+      box-shadow: 0 0 0 4px var(--focus);
+    }
+    input::placeholder, textarea::placeholder{ color: rgba(17,24,39,.45); }
+    input[type="number"]{ max-width: 240px; }
+
+    /* Chips / pills */
+    .chips{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:flex-end; }
+    .chip{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(17,24,39,.06);
+      border: 1px solid rgba(17,24,39,.10);
+      color: var(--ink);
+      font-weight: 800;
+      font-size: 12px;
+      letter-spacing: .2px;
+    }
+    .chip.off{ color: var(--muted); background: rgba(17,24,39,.04); }
+    .dot{
+      width: 8px; height: 8px; border-radius: 999px;
+      background: rgba(17,24,39,.35);
+      box-shadow: 0 0 0 3px rgba(17,24,39,.06);
+    }
+    .dot.on{ background: rgba(16,185,129,.95); box-shadow: 0 0 0 3px rgba(16,185,129,.14); }
+    .dot.warn{ background: rgba(245,158,11,.95); box-shadow: 0 0 0 3px rgba(245,158,11,.14); }
+
+    /* Timer bar */
+    .timerBar{
+      display:flex; align-items:flex-end; justify-content:space-between; gap: 12px;
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 16px;
+      background: rgba(17,24,39,.03);
+      border: 1px solid rgba(17,24,39,.08);
+    }
+    .timeLabel{ font-size: 12px; color: var(--muted); }
+    .timeBig{
+      font-variant-numeric: tabular-nums;
+      letter-spacing: .6px;
+      font-size: 34px;
+      font-weight: 950;
+      line-height: 1.05;
+      margin-top: 2px;
+    }
+
+    /* Buttons */
+    .btnrow{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 12px; }
+    button{
+      border: 1px solid rgba(17,24,39,.14);
+      background: var(--btn);
+      color: var(--btnInk);
+      padding: 10px 12px;
+      border-radius: 14px;
+      font-weight: 900;
+      cursor:pointer;
+      touch-action: manipulation;
+      transition: transform .06s ease, filter .12s ease;
+      user-select: none;
+    }
+    button:hover{ filter: brightness(1.04); }
+    button:active{ transform: translateY(1px); }
+    button.secondary{
+      background: var(--btn2);
+      color: var(--ink);
+      border-color: rgba(17,24,39,.12);
+    }
+    button.danger{
+      background: var(--danger);
+      color: #b91c1c;
+      border-color: var(--dangerStroke);
+    }
+    button:disabled{ opacity: .55; cursor:not-allowed; }
+
+    /* Toggle */
+    .toggleRow{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .switch{
+      display:inline-flex; align-items:center; gap: 10px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(17,24,39,.04);
+      border: 1px solid rgba(17,24,39,.10);
+      user-select:none;
+    }
+    .switch input{ width: 18px; height: 18px; accent-color: rgb(59,130,246); }
+
+    /* Video */
+    .videoBox{
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 18px;
+      border: 1px solid rgba(17,24,39,.10);
+      background: rgba(17,24,39,.02);
+    }
+    video, iframe{
+      width: 100%;
+      aspect-ratio: 16/9;
+      border-radius: 14px;
+      background: #000;
+      border: 1px solid rgba(17,24,39,.10);
+    }
+    .msg{
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(245,158,11,.35);
+      background: rgba(245,158,11,.12);
+      color: rgba(17,24,39,.92);
+      font-size: 12px;
+      line-height: 1.35;
+      display:none;
+    }
+
+    /* Timed categories */
+    .timers{ display:grid; grid-template-columns: 1fr; gap: 10px; margin-top: 14px; }
+    @media (min-width: 980px){ .timers{ grid-template-columns: 1fr 1fr; } }
+
+    .timerCard{
+      border-radius: 18px;
+      border: 1px solid rgba(17,24,39,.12);
+      padding: 12px;
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items:center;
+      background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.72));
+    }
+    .tone1{ background: linear-gradient(180deg, var(--c1), rgba(255,255,255,.72)); border-color: var(--c1b); }
+    .tone2{ background: linear-gradient(180deg, var(--c2), rgba(255,255,255,.72)); border-color: var(--c2b); }
+    .tone3{ background: linear-gradient(180deg, var(--c3), rgba(255,255,255,.72)); border-color: var(--c3b); }
+    .tone4{ background: linear-gradient(180deg, var(--c4), rgba(255,255,255,.72)); border-color: var(--c4b); }
+
+    .tName{ font-weight: 950; letter-spacing: .2px; }
+    .tDesc{ margin-top: 4px; font-size: 12px; color: var(--muted); line-height: 1.35; }
+    .tRight{ display:grid; gap: 8px; justify-items:end; }
+    .tTime{
+      font-size: 26px;
+      font-weight: 950;
+      font-variant-numeric: tabular-nums;
+    }
+    .tCount{
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    /* Log */
+    .log{
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 18px;
+      border: 1px solid rgba(17,24,39,.10);
+      background: rgba(17,24,39,.02);
+      max-height: 380px;
+      overflow:auto;
+    }
+    .logHeader{
+      display:flex; align-items:baseline; justify-content:space-between; gap:10px; flex-wrap:wrap;
+      margin-bottom: 10px;
+    }
+    .logTitle{ font-weight: 950; }
+    .logSmall{ font-size: 12px; color: var(--muted); }
+    .logItem{
+      display:grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 10px;
+      align-items:center;
+      padding: 10px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.90);
+      border: 1px solid rgba(17,24,39,.10);
+      margin-bottom: 10px;
+    }
+    .tstamp{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 12px;
+      color: rgba(17,24,39,.90);
+      padding: 6px 8px;
+      border-radius: 999px;
+      background: rgba(17,24,39,.04);
+      border: 1px solid rgba(17,24,39,.08);
+      font-variant-numeric: tabular-nums;
+    }
+    .logCat{ font-weight: 900; }
+    .logMeta{ font-size: 12px; color: var(--muted2); margin-top: 2px; }
+    .jumpBtn{ padding: 9px 10px; border-radius: 14px; }
+
+    /* Export */
+    #output{
+      min-height: 220px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 12px;
+      white-space: pre;
+      background: #fff;
+    }
+
+    .tip{
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .kbd{
+      font-family: ui-monospace, Menlo, Consolas, monospace;
+      padding: 2px 6px;
+      border-radius: 8px;
+      border: 1px solid rgba(17,24,39,.12);
+      background: rgba(17,24,39,.04);
+      color: rgba(17,24,39,.9);
+    }
+  </style>
+</head>
+
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <div class="brand">
+      <img class="logo" src="Next-Gen-Music-Ed-logo.png" alt="Next Gen Music Ed logo">
+      <div>
+        <h1>Music Lesson Observation App</h1>
+        <div class="by">Developed by Kevin Droe, Ph.D.</div>
+      </div>
+    </div>
+    <div class="chips">
+      <span id="modeChip" class="chip"><span class="dot warn" id="modeDot"></span><span id="modeText">Live mode</span></span>
+      <span id="syncChip" class="chip off"><span class="dot" id="syncDot"></span><span id="syncText">Sync: Off</span></span>
+      <span id="stateChip" class="chip off"><span class="dot" id="stateDot"></span><span id="stateText">Stopped</span></span>
+    </div>
+  </div>
+
+  <div class="sub">
+    Time what happens during a lesson (live or video). Start a category to record time; the app prevents overlap automatically.
+    Use the Event Log to jump back to moments in a video.
+  </div>
+
+  <div class="grid">
+    <!-- LEFT -->
+    <div class="card">
+      <div class="row two">
+        <div>
+          <label for="observer">Observer name</label>
+          <input id="observer" type="text" placeholder="Your name" />
+        </div>
+        <div>
+          <label for="date">Date</label>
+          <input id="date" type="date" />
+        </div>
+      </div>
+
+      <div class="row three" style="margin-top:10px;">
+        <div>
+          <label for="teacher">Observed teacher</label>
+          <input id="teacher" type="text" placeholder="Teacher name (optional)" />
+        </div>
+        <div>
+          <label for="context">Context</label>
+          <input id="context" type="text" placeholder="Lesson / rehearsal / sectional" />
+        </div>
+        <div>
+          <label for="duration">Target observation length (minutes)</label>
+          <input id="duration" type="number" min="1" step="1" value="10" />
+        </div>
+      </div>
+
+      <div class="videoBox">
+        <div class="row two">
+          <div>
+            <label for="mode">Mode</label>
+            <select id="mode">
+              <option value="live">Live Observation</option>
+              <option value="video">Video Observation</option>
+            </select>
+          </div>
+          <div class="toggleRow" style="align-content:end;">
+            <div class="switch">
+              <input id="sync" type="checkbox" />
+              <span style="font-weight:900;">Sync observation to playback</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="videoControls" style="display:none; margin-top:10px;">
+          <div class="row two">
+            <div>
+              <label for="videoFile">Case B — Upload video file</label>
+              <input id="videoFile" type="file" accept="video/*" />
+            </div>
+            <div>
+              <label for="ytUrl">Case A — Paste YouTube URL</label>
+              <input id="ytUrl" type="url" placeholder="https://www.youtube.com/watch?v=..." />
+            </div>
+          </div>
+
+          <div class="btnrow">
+            <button id="loadYt" class="secondary">Load YouTube</button>
+            <button id="clearVideo" class="secondary">Clear video</button>
+          </div>
+
+          <div id="ytMsg" class="msg"></div>
+
+          <div style="margin-top:10px;">
+            <div id="localWrap" style="display:none;">
+              <video id="video" controls playsinline></video>
+            </div>
+            <div id="ytWrap" style="display:none;">
+              <div id="ytPlayer"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="timerBar">
+        <div>
+          <div class="timeLabel">Elapsed time</div>
+          <div id="elapsed" class="timeBig">00:00.0</div>
+        </div>
+        <div class="chips" style="justify-content:flex-end;">
+          <span id="targetChip" class="chip">Target: 10:00</span>
+          <span id="timeChip" class="chip off">Time: 00:00</span>
+          <span id="activeChip" class="chip off">Active: None</span>
+        </div>
+      </div>
+
+      <div class="btnrow">
+        <button id="start">Start observation</button>
+        <button id="stop" class="secondary">Stop observation</button>
+        <button id="reset" class="danger">Reset</button>
+        <button id="export">Export summary</button>
+      </div>
+
+      <div class="timers" id="timers"></div>
+
+      <div class="btnrow">
+        <button id="undo" class="secondary">Undo last</button>
+        <button id="clearLog" class="secondary">Clear log</button>
+      </div>
+
+      <div style="margin-top:12px;">
+        <label for="notes">Notes</label>
+        <textarea id="notes" placeholder="Notes (examples, patterns, reflections, context)…"></textarea>
+      </div>
+
+      <div class="tip">
+        Shortcuts: <span class="kbd">Space</span> Start/Stop observation •
+        <span class="kbd">1</span> Student-only • <span class="kbd">2</span> Modeling •
+        <span class="kbd">3</span> Together • <span class="kbd">4</span> Talk •
+        <span class="kbd">Z</span> Undo • <span class="kbd">E</span> Export
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="card">
+      <div class="logHeader">
+        <div>
+          <div class="logTitle">Event Log</div>
+          <div class="logSmall">Each category switch is logged with a timestamp. In video mode, use <b>Jump</b> to seek.</div>
+        </div>
+        <div class="chips" style="justify-content:flex-end;">
+          <span class="chip off" id="jumpHelp">Jump requires video</span>
+        </div>
+      </div>
+
+      <div class="log" id="log"></div>
+
+      <div style="margin-top:12px;">
+        <label for="output">Export (copy/paste into LMS or Google Form)</label>
+        <textarea id="output" placeholder="Click “Export summary” to generate a clean report."></textarea>
+      </div>
+
+      <div class="btnrow" style="justify-content:flex-start;">
+        <button id="copy" class="secondary">Copy to clipboard</button>
+        <button id="csv" class="secondary">Download CSV</button>
+        <button id="jsonOut" class="secondary">Export Log JSON</button>
+        <button id="jsonInBtn" class="secondary">Import Log JSON</button>
+        <input id="jsonIn" type="file" accept="application/json" style="display:none;">
+      </div>
+
+      <div class="tip">
+        Sharing: export a JSON log and send it to a student. They can import it and load the same YouTube link (Case A) or the same video file (Case B) to use Jump.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- YouTube IFrame API (allowed external script) -->
+<script src="https://www.youtube.com/iframe_api"></script>
+
+<script>
+(() => {
+  const categories = [
+    {
+      id:"studentOnly",
+      label:"1. Student-only performance",
+      desc:"Student is performing; teacher is not performing (You play).",
+      tone:"tone1",
+      key:"1"
+    },
+    {
+      id:"teacherModeling",
+      label:"2. Teacher modeling",
+      desc:"Teacher demonstrates (plays/sings) for the student (I play).",
+      tone:"tone2",
+      key:"2"
+    },
+    {
+      id:"together",
+      label:"3. Student & Teacher performance",
+      desc:"They perform together (We play).",
+      tone:"tone3",
+      key:"3"
+    },
+    {
+      id:"talk",
+      label:"4. Talk",
+      desc:"Verbal instruction, discussion, feedback, questions.",
+      tone:"tone4",
+      key:"4"
+    }
+  ];
+
+  const el = {
+    observer: document.getElementById("observer"),
+    date: document.getElementById("date"),
+    teacher: document.getElementById("teacher"),
+    context: document.getElementById("context"),
+    duration: document.getElementById("duration"),
+    notes: document.getElementById("notes"),
+
+    mode: document.getElementById("mode"),
+    sync: document.getElementById("sync"),
+
+    videoControls: document.getElementById("videoControls"),
+    videoFile: document.getElementById("videoFile"),
+    ytUrl: document.getElementById("ytUrl"),
+    loadYt: document.getElementById("loadYt"),
+    clearVideo: document.getElementById("clearVideo"),
+    ytMsg: document.getElementById("ytMsg"),
+    localWrap: document.getElementById("localWrap"),
+    ytWrap: document.getElementById("ytWrap"),
+    video: document.getElementById("video"),
+
+    elapsed: document.getElementById("elapsed"),
+    targetChip: document.getElementById("targetChip"),
+    timeChip: document.getElementById("timeChip"),
+    activeChip: document.getElementById("activeChip"),
+
+    start: document.getElementById("start"),
+    stop: document.getElementById("stop"),
+    reset: document.getElementById("reset"),
+    export: document.getElementById("export"),
+    undo: document.getElementById("undo"),
+    clearLog: document.getElementById("clearLog"),
+
+    timers: document.getElementById("timers"),
+    log: document.getElementById("log"),
+
+    output: document.getElementById("output"),
+    copy: document.getElementById("copy"),
+    csv: document.getElementById("csv"),
+    jsonOut: document.getElementById("jsonOut"),
+    jsonInBtn: document.getElementById("jsonInBtn"),
+    jsonIn: document.getElementById("jsonIn"),
+
+    modeText: document.getElementById("modeText"),
+    modeDot: document.getElementById("modeDot"),
+    modeChip: document.getElementById("modeChip"),
+
+    syncText: document.getElementById("syncText"),
+    syncDot: document.getElementById("syncDot"),
+    syncChip: document.getElementById("syncChip"),
+
+    stateText: document.getElementById("stateText"),
+    stateDot: document.getElementById("stateDot"),
+    stateChip: document.getElementById("stateChip"),
+
+    jumpHelp: document.getElementById("jumpHelp")
+  };
+
+  // default date
+  el.date.valueAsDate = new Date();
+
+  const state = {
+    running: false,
+
+    // live timer
+    liveStartPerf: null,
+    liveElapsedMs: 0,
+
+    // current active category
+    activeId: null,
+    activeSincePerf: null,      // live mode perf timestamp
+    activeSinceVideoSec: null,  // video mode seconds
+
+    // accumulated ms per category
+    catMs: Object.fromEntries(categories.map(c => [c.id, 0])),
+    // times category was started (count)
+    catStarts: Object.fromEntries(categories.map(c => [c.id, 0])),
+
+    // undo stack (for category switches)
+    history: [], // entries described below
+
+    // events for log / export
+    events: [], // {tSec, tText, type, catId, catLabel, details, source}
+
+    // video
+    videoMode: "none", // none | local | youtube
+    ytPlayer: null,
+    ytReady: false,
+    ytVideoId: null
+  };
+
+  function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+
+  function fmtMs(ms){
+    const totalTenths = Math.floor(ms / 100);
+    const tenths = totalTenths % 10;
+    const totalSeconds = Math.floor(totalTenths / 10);
+    const s = totalSeconds % 60;
+    const m = Math.floor(totalSeconds / 60);
+    return `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}.${tenths}`;
+  }
+
+  function fmtSec(sec){
+    if (!isFinite(sec) || sec < 0) return "N/A";
+    const s = Math.floor(sec);
+    const mm = Math.floor(s / 60);
+    const ss = s % 60;
+    return `${String(mm).padStart(2,"0")}:${String(ss).padStart(2,"0")}`;
+  }
+
+  function updateTarget(){
+    const mins = clamp(parseInt(el.duration.value || "10", 10), 1, 999);
+    el.targetChip.textContent = `Target: ${fmtSec(mins * 60)}`;
+  }
+  el.duration.addEventListener("change", updateTarget);
+  updateTarget();
+
+  // chips
+  function setModeChip(){
+    const m = el.mode.value;
+    el.modeText.textContent = (m === "live") ? "Live mode" : "Video mode";
+    el.modeDot.className = "dot " + (m === "live" ? "warn" : "on");
+  }
+
+  function setSyncChip(){
+    const on = !!el.sync.checked;
+    el.syncText.textContent = `Sync: ${on ? "On" : "Off"}`;
+    el.syncChip.className = "chip " + (on ? "" : "off");
+    el.syncDot.className = "dot " + (on ? "on" : "");
+  }
+
+  function setStateChip(){
+    el.stateText.textContent = state.running ? "Running" : "Stopped";
+    el.stateChip.className = "chip " + (state.running ? "" : "off");
+    el.stateDot.className = "dot " + (state.running ? "on" : "");
+    el.start.disabled = state.running;
+    el.stop.disabled = !state.running;
+  }
+
+  function setActiveChip(){
+    if (!state.activeId){
+      el.activeChip.textContent = "Active: None";
+      el.activeChip.className = "chip off";
+      return;
+    }
+    const c = categories.find(x => x.id === state.activeId);
+    el.activeChip.textContent = "Active: " + (c ? c.label.replace(/^\d+\.\s*/,"") : state.activeId);
+    el.activeChip.className = "chip";
+  }
+
+  function setJumpHelp(){
+    const ok = (el.mode.value === "video") && (state.videoMode === "local" || state.videoMode === "youtube");
+    el.jumpHelp.textContent = ok ? "Jump enabled" : "Jump requires video";
+    el.jumpHelp.className = "chip " + (ok ? "" : "off");
+  }
+
+  // Mode UI
+  function applyModeUI(){
+    setModeChip();
+    setSyncChip();
+
+    if (el.mode.value === "video"){
+      el.videoControls.style.display = "";
+      el.sync.disabled = false;
+      setJumpHelp();
+    } else {
+      el.videoControls.style.display = "none";
+      el.sync.checked = false;
+      setSyncChip();
+      setJumpHelp();
+    }
+
+    // stop & end any active category to avoid accidental carryover
+    stop();
+    endActiveCategory(true);
+    renderLog();
+    renderTimers();
+  }
+
+  el.mode.addEventListener("change", applyModeUI);
+  el.sync.addEventListener("change", setSyncChip);
+  applyModeUI();
+
+  // Video support
+  function showYtMsg(text){
+    el.ytMsg.textContent = text;
+    el.ytMsg.style.display = text ? "block" : "none";
+  }
+
+  function setVideoMode(mode){
+    state.videoMode = mode;
+    el.localWrap.style.display = (mode === "local") ? "" : "none";
+    el.ytWrap.style.display = (mode === "youtube") ? "" : "none";
+    setJumpHelp();
+  }
+
+  function clearLocalVideo(){
+    try { el.video.pause(); } catch {}
+    el.video.removeAttribute("src");
+    el.video.load();
+    el.videoFile.value = "";
+  }
+
+  function destroyYt(){
+    if (state.ytPlayer) {
+      try { state.ytPlayer.destroy(); } catch {}
+      state.ytPlayer = null;
+    }
+    state.ytReady = false;
+    state.ytVideoId = null;
+  }
+
+  function parseYouTubeId(url){
+    try{
+      const u = new URL(url);
+      if (u.hostname.includes("youtu.be")) return u.pathname.slice(1);
+      if (u.searchParams.get("v")) return u.searchParams.get("v");
+      const parts = u.pathname.split("/");
+      const i = parts.indexOf("embed");
+      if (i >= 0 && parts[i+1]) return parts[i+1];
+      return "";
+    }catch{
+      return "";
+    }
+  }
+
+  window.onYouTubeIframeAPIReady = () => {};
+
+  // Local upload
+  el.videoFile.addEventListener("change", () => {
+    const f = el.videoFile.files && el.videoFile.files[0];
+    if (!f) return;
+
+    destroyYt();
+    el.ytUrl.value = "";
+    showYtMsg("");
+
+    const url = URL.createObjectURL(f);
+    el.video.src = url;
+    setVideoMode("local");
+  });
+
+  // YouTube load
+  el.loadYt.addEventListener("click", () => {
+    const id = parseYouTubeId(el.ytUrl.value.trim());
+    if (!id) { alert("Could not read a YouTube video ID from that link."); return; }
+
+    clearLocalVideo();
+    destroyYt();
+    showYtMsg("");
+
+    document.getElementById("ytPlayer").innerHTML = "";
+    setVideoMode("youtube");
+    state.ytReady = false;
+    state.ytVideoId = id;
+
+    try{
+      state.ytPlayer = new YT.Player("ytPlayer", {
+        videoId: id,
+        playerVars: {
+          playsinline: 1,
+          rel: 0,
+          modestbranding: 1,
+          origin: window.location.origin
+        },
+        events: {
+          onReady: () => { state.ytReady = true; },
+          onError: () => {
+            state.ytReady = false;
+            showYtMsg("This YouTube video can’t be embedded (or a player configuration error occurred). Please use Upload Video instead (Case B).");
+          },
+          onStateChange: (ev) => {
+            if (!el.sync.checked || el.mode.value !== "video") return;
+            // 1 playing, 2 paused, 0 ended
+            if (ev.data === 1) start();
+            if (ev.data === 2 || ev.data === 0) stop();
+          }
+        }
+      });
+    }catch{
+      showYtMsg("YouTube couldn’t be loaded. Please use Upload Video instead (Case B).");
+    }
+  });
+
+  el.clearVideo.addEventListener("click", () => {
+    clearLocalVideo();
+    destroyYt();
+    el.ytUrl.value = "";
+    showYtMsg("");
+    setVideoMode("none");
+  });
+
+  // Local video playback sync
+  el.video.addEventListener("play", () => {
+    if (el.mode.value !== "video") return;
+    if (!el.sync.checked) return;
+    start();
+  });
+  el.video.addEventListener("pause", () => {
+    if (el.mode.value !== "video") return;
+    if (!el.sync.checked) return;
+    stop();
+  });
+  el.video.addEventListener("ended", () => {
+    if (el.mode.value !== "video") return;
+    if (!el.sync.checked) return;
+    stop();
+  });
+
+  function currentObservationTimeSec(){
+    if (el.mode.value === "live") return state.liveElapsedMs / 1000;
+
+    if (state.videoMode === "local") return el.video.currentTime || 0;
+    if (state.videoMode === "youtube") {
+      if (state.ytReady && state.ytPlayer && state.ytPlayer.getCurrentTime) return state.ytPlayer.getCurrentTime() || 0;
+      return NaN;
+    }
+    return NaN;
+  }
+
+  // Timed category logic (prevents overlap)
+  function endActiveCategory(silent=false){
+    if (!state.activeId) return;
+
+    const catId = state.activeId;
+
+    if (el.mode.value === "live"){
+      // close using performance timer delta
+      // compute via wallclock using state.activeSincePerf + "now" tick, but we store via elapsedMs at switch time
+      // We'll compute using "liveElapsedMs" checkpoints:
+      // activeSincePerf stores liveElapsedMs at start
+      const startMs = state.activeSincePerf ?? state.liveElapsedMs;
+      const addMs = Math.max(0, state.liveElapsedMs - startMs);
+      state.catMs[catId] += addMs;
+    } else {
+      const nowSec = currentObservationTimeSec();
+      const startSec = state.activeSinceVideoSec ?? nowSec;
+      const addMs = Math.max(0, (nowSec - startSec) * 1000);
+      state.catMs[catId] += addMs;
+    }
+
+    if (!silent){
+      const tSec = currentObservationTimeSec();
+      state.events.push({
+        tSec: isFinite(tSec) ? tSec : null,
+        tText: isFinite(tSec) ? fmtSec(tSec) : "N/A",
+        type: "stop",
+        catId,
+        catLabel: categories.find(c => c.id === catId)?.label.replace(/^\d+\.\s*/,"") || catId,
+        details: "Stopped category",
+        source: (el.mode.value === "live") ? "live" : state.videoMode
+      });
+    }
+
+    state.activeId = null;
+    state.activeSincePerf = null;
+    state.activeSinceVideoSec = null;
+    setActiveChip();
+  }
+
+  function startCategory(catId){
+    // must be observing
+    if (!state.running) start();
+
+    // snapshot for undo: store full previous state
+    const snapshot = {
+      kind: "switch",
+      prevActiveId: state.activeId,
+      prevActiveSincePerf: state.activeSincePerf,
+      prevActiveSinceVideoSec: state.activeSinceVideoSec,
+      prevCatMs: { ...state.catMs },
+      prevCatStarts: { ...state.catStarts },
+      prevEventsLen: state.events.length
+    };
+    state.history.push(snapshot);
+
+    // end previous active category (silent stop event handled explicitly below as part of switch)
+    const prev = state.activeId;
+    if (prev){
+      endActiveCategory(true);
+    }
+
+    // start new
+    state.activeId = catId;
+
+    if (el.mode.value === "live"){
+      state.activeSincePerf = state.liveElapsedMs;
+    } else {
+      state.activeSinceVideoSec = currentObservationTimeSec();
+    }
+
+    state.catStarts[catId] += 1;
+
+    const tSec = currentObservationTimeSec();
+    state.events.push({
+      tSec: isFinite(tSec) ? tSec : null,
+      tText: isFinite(tSec) ? fmtSec(tSec) : "N/A",
+      type: "start",
+      catId,
+      catLabel: categories.find(c => c.id === catId)?.label.replace(/^\d+\.\s*/,"") || catId,
+      details: (prev ? `Switched from ${categories.find(c=>c.id===prev)?.label.replace(/^\d+\.\s*/,"") || prev}` : "Started category"),
+      source: (el.mode.value === "live") ? "live" : state.videoMode
+    });
+
+    setActiveChip();
+    renderTimers();
+    renderLog();
+  }
+
+  function stopObservation(){
+    stop();
+    // close current category too (so totals reflect what happened)
+    endActiveCategory(false);
+    renderTimers();
+    renderLog();
+  }
+
+  // main observation timer
+  function tick(now){
+    if (!state.running) return;
+
+    if (el.mode.value === "live"){
+      if (state.liveStartPerf == null) state.liveStartPerf = now;
+      const dt = now - state.liveStartPerf;
+      state.liveStartPerf = now;
+      state.liveElapsedMs += dt;
+
+      const mins = clamp(parseInt(el.duration.value || "10", 10), 1, 999);
+      const targetMs = mins * 60 * 1000;
+      if (state.liveElapsedMs >= targetMs){
+        state.liveElapsedMs = targetMs;
+        stopObservation();
+      }
+
+      el.elapsed.textContent = fmtMs(state.liveElapsedMs);
+    } else {
+      const sec = currentObservationTimeSec();
+      el.elapsed.textContent = isFinite(sec) ? fmtMs(sec * 1000) : "00:00.0";
+    }
+
+    const sec = currentObservationTimeSec();
+    el.timeChip.textContent = "Time: " + (isFinite(sec) ? fmtSec(sec) : "N/A");
+    el.timeChip.className = "chip " + (isFinite(sec) ? "" : "off");
+
+    // live mode: update active category running total preview by adding liveElapsed delta temporarily
+    renderTimers(true);
+
+    requestAnimationFrame(tick);
+  }
+
+  function start(){
+    if (state.running) return;
+    state.running = true;
+
+    if (el.mode.value === "live"){
+      state.liveStartPerf = null;
+    } else {
+      // attempt to play if video mode and sync toggle (or user expectation)
+      if (state.videoMode === "local") el.video.play().catch(()=>{});
+      if (state.videoMode === "youtube" && state.ytReady && state.ytPlayer && state.ytPlayer.playVideo){
+        try{ state.ytPlayer.playVideo(); }catch{}
+      }
+    }
+
+    setStateChip();
+    requestAnimationFrame(tick);
+  }
+
+  function stop(){
+    if (!state.running) return;
+    state.running = false;
+
+    if (el.mode.value === "live"){
+      state.liveStartPerf = null;
+    } else {
+      if (el.sync.checked){
+        if (state.videoMode === "local") { try{ el.video.pause(); }catch{} }
+        if (state.videoMode === "youtube" && state.ytReady && state.ytPlayer && state.ytPlayer.pauseVideo){
+          try{ state.ytPlayer.pauseVideo(); }catch{}
+        }
+      }
+    }
+
+    setStateChip();
+  }
+
+  function resetAll(){
+    stop();
+    endActiveCategory(true);
+
+    state.liveElapsedMs = 0;
+    state.liveStartPerf = null;
+    el.elapsed.textContent = fmtMs(0);
+
+    for (const k of Object.keys(state.catMs)) state.catMs[k] = 0;
+    for (const k of Object.keys(state.catStarts)) state.catStarts[k] = 0;
+
+    state.history = [];
+    state.events = [];
+
+    el.notes.value = "";
+    el.output.value = "";
+
+    setActiveChip();
+    renderTimers();
+    renderLog();
+  }
+
+  el.start.addEventListener("click", start);
+  el.stop.addEventListener("click", stopObservation);
+  el.reset.addEventListener("click", resetAll);
+
+  // Undo
+  function undoLast(){
+    const last = state.history.pop();
+    if (!last) return;
+
+    if (last.kind === "switch"){
+      // restore
+      state.activeId = last.prevActiveId;
+      state.activeSincePerf = last.prevActiveSincePerf;
+      state.activeSinceVideoSec = last.prevActiveSinceVideoSec;
+      state.catMs = { ...last.prevCatMs };
+      state.catStarts = { ...last.prevCatStarts };
+      // truncate events
+      state.events = state.events.slice(0, last.prevEventsLen);
+      setActiveChip();
+      renderTimers();
+      renderLog();
+    }
+  }
+
+  el.undo.addEventListener("click", undoLast);
+  el.clearLog.addEventListener("click", () => { state.history = []; state.events = []; renderLog(); });
+
+  // Timers UI
+  function renderTimers(previewRunning=false){
+    el.timers.innerHTML = "";
+
+    const nowLiveMs = state.liveElapsedMs;
+    const nowVideoSec = currentObservationTimeSec();
+
+    categories.forEach((c, idx) => {
+      const card = document.createElement("div");
+      card.className = `timerCard ${c.tone}`;
+
+      const left = document.createElement("div");
+      left.innerHTML = `<div class="tName">${c.label}</div><div class="tDesc">${c.desc}</div>`;
+
+      // compute display ms with optional running preview
+      let ms = state.catMs[c.id];
+      if (previewRunning && state.running && state.activeId === c.id){
+        if (el.mode.value === "live"){
+          const startMs = state.activeSincePerf ?? nowLiveMs;
+          ms += Math.max(0, nowLiveMs - startMs);
+        } else {
+          const startSec = state.activeSinceVideoSec ?? nowVideoSec;
+          if (isFinite(nowVideoSec)) ms += Math.max(0, (nowVideoSec - startSec) * 1000);
+        }
+      }
+
+      const right = document.createElement("div");
+      right.className = "tRight";
+
+      const t = document.createElement("div");
+      t.className = "tTime";
+      t.textContent = fmtMs(ms);
+
+      const cnt = document.createElement("div");
+      cnt.className = "tCount";
+      cnt.textContent = `Starts: ${state.catStarts[c.id]}`;
+
+      const btns = document.createElement("div");
+      btns.className = "btnrow";
+      btns.style.marginTop = "0";
+      btns.style.justifyContent = "flex-end";
+
+      const startBtn = document.createElement("button");
+      startBtn.textContent = (state.activeId === c.id) ? "Active" : "Start this";
+      startBtn.disabled = (state.activeId === c.id);
+      startBtn.addEventListener("click", () => startCategory(c.id));
+
+      btns.appendChild(startBtn);
+
+      right.appendChild(t);
+      right.appendChild(cnt);
+      right.appendChild(btns);
+
+      card.appendChild(left);
+      card.appendChild(right);
+      el.timers.appendChild(card);
+    });
+
+    setActiveChip();
+  }
+
+  // Log UI
+  function renderLog(){
+    el.log.innerHTML = "";
+    setJumpHelp();
+
+    if (state.events.length === 0){
+      el.log.innerHTML = `<div style="color: ${getComputedStyle(document.documentElement).getPropertyValue('--muted')}; font-size: 12px;">No events logged yet.</div>`;
+      return;
+    }
+
+    const canJump = (el.mode.value === "video") && (state.videoMode === "local" || state.videoMode === "youtube");
+
+    state.events.slice().reverse().forEach((ev) => {
+      const item = document.createElement("div");
+      item.className = "logItem";
+
+      const t = document.createElement("div");
+      t.className = "tstamp";
+      t.textContent = ev.tText;
+
+      const mid = document.createElement("div");
+      mid.innerHTML = `<div class="logCat">${ev.type.toUpperCase()}: ${ev.catLabel}</div><div class="logMeta">${ev.details} • Source: ${ev.source}</div>`;
+
+      const btn = document.createElement("button");
+      btn.className = "secondary jumpBtn";
+      btn.textContent = "Jump";
+      btn.disabled = !(canJump && isFinite(ev.tSec) && ev.tSec != null);
+      btn.addEventListener("click", () => jumpTo(ev.tSec));
+
+      item.appendChild(t);
+      item.appendChild(mid);
+      item.appendChild(btn);
+      el.log.appendChild(item);
+    });
+  }
+
+  function jumpTo(sec){
+    if (!isFinite(sec) || sec == null) return;
+    if (el.mode.value !== "video") return;
+
+    if (state.videoMode === "local"){
+      el.video.currentTime = sec;
+      el.video.play().catch(()=>{});
+    } else if (state.videoMode === "youtube" && state.ytReady && state.ytPlayer && state.ytPlayer.seekTo){
+      state.ytPlayer.seekTo(sec, true);
+      try{ state.ytPlayer.playVideo(); }catch{}
+    }
+  }
+
+  // Export summary
+  function exportSummary(){
+    if (state.running) stopObservation();
+
+    const mins = clamp(parseInt(el.duration.value || "10", 10), 1, 999);
+    const mode = el.mode.value;
+    const source = (mode === "live") ? "live stopwatch" : (state.videoMode === "local" ? "local video" : state.videoMode === "youtube" ? "YouTube" : "no video loaded");
+
+    const lines = [];
+    lines.push("MUSIC LESSON OBSERVATION APP");
+    lines.push("---------------------------");
+    lines.push("Developed by Kevin Droe, Ph.D.");
+    lines.push("");
+
+    const observer = el.observer.value.trim();
+    const dateVal = el.date.value;
+    const teacher = el.teacher.value.trim();
+    const context = el.context.value.trim();
+
+    if (observer) lines.push(`Observer: ${observer}`);
+    if (dateVal) lines.push(`Date: ${dateVal}`);
+    if (teacher) lines.push(`Observed teacher: ${teacher}`);
+    if (context) lines.push(`Context: ${context}`);
+    lines.push(`Mode: ${mode}`);
+    lines.push(`Video source: ${source}`);
+    if (mode === "video" && el.ytUrl.value.trim()) lines.push(`YouTube URL: ${el.ytUrl.value.trim()}`);
+    lines.push(`Target length (min): ${mins}`);
+
+    const observed = (mode === "live") ? fmtSec(state.liveElapsedMs/1000) : (isFinite(currentObservationTimeSec()) ? fmtSec(currentObservationTimeSec()) : "N/A");
+    lines.push(`Observed time: ${observed}`);
+    lines.push("");
+
+    lines.push("Time by category:");
+    categories.forEach(c => {
+      lines.push(`- ${c.label.replace(/^\d+\.\s*/,"")}: ${fmtSec(state.catMs[c.id]/1000)} (Starts: ${state.catStarts[c.id]})`);
+    });
+
+    const notes = el.notes.value.trim();
+    if (notes){
+      lines.push("");
+      lines.push("Notes:");
+      lines.push(notes);
+    }
+
+    lines.push("");
+    lines.push("Event log (most recent first):");
+    if (state.events.length === 0) lines.push("(No events logged)");
+    else state.events.slice().reverse().forEach(ev => lines.push(`${ev.tText} — ${ev.type.toUpperCase()} ${ev.catLabel}`));
+
+    lines.push("");
+    lines.push("One-line version:");
+    const one = [
+      observer ? `Observer=${observer}` : null,
+      dateVal ? `Date=${dateVal}` : null,
+      teacher ? `Teacher=${teacher}` : null,
+      context ? `Context=${context}` : null,
+      `Mode=${mode}`,
+      `Time=${observed}`,
+      ...categories.map(c => `${c.id}=${fmtSec(state.catMs[c.id]/1000)}`)
+    ].filter(Boolean).join(" | ");
+    lines.push(one);
+
+    el.output.value = lines.join("\n");
+  }
+
+  el.export.addEventListener("click", exportSummary);
+
+  // Copy
+  el.copy.addEventListener("click", async () => {
+    const text = el.output.value.trim();
+    if (!text) return;
+    try{
+      await navigator.clipboard.writeText(text);
+      el.copy.textContent = "Copied!";
+      setTimeout(() => el.copy.textContent = "Copy to clipboard", 900);
+    }catch{
+      el.output.focus(); el.output.select();
+      document.execCommand("copy");
+      el.copy.textContent = "Copied!";
+      setTimeout(() => el.copy.textContent = "Copy to clipboard", 900);
+    }
+  });
+
+  // CSV
+  function downloadCSV(){
+    if (state.running) stopObservation();
+
+    const mins = clamp(parseInt(el.duration.value || "10", 10), 1, 999);
+    const mode = el.mode.value;
+    const timeSource = (mode === "live") ? "live" : state.videoMode;
+
+    const headers = [
+      "observer","date","observed_teacher","context",
+      "target_minutes","mode","time_source","youtube_url",
+      ...categories.flatMap(c => [`${c.id}_time_mmss`, `${c.id}_starts`]),
+      "notes",
+      "event_time","event_type","event_category","event_details","event_source"
+    ];
+
+    const base = [
+      el.observer.value.trim(),
+      el.date.value,
+      el.teacher.value.trim(),
+      el.context.value.trim(),
+      mins,
+      mode,
+      timeSource,
+      el.ytUrl.value.trim() || ""
+    ];
+
+    categories.forEach(c => {
+      base.push(fmtSec(state.catMs[c.id]/1000));
+      base.push(state.catStarts[c.id]);
+    });
+
+    base.push(el.notes.value.trim());
+
+    const esc = (s) => {
+      const str = (s ?? "").toString();
+      if (/[",\n]/.test(str)) return `"${str.replace(/"/g, '""')}"`;
+      return str;
+    };
+
+    const rows = [];
+    if (state.events.length === 0){
+      rows.push([...base, "", "", "", "", ""].map(esc).join(","));
+    } else {
+      state.events.forEach(ev => {
+        rows.push([...base, ev.tText, ev.type, ev.catLabel, ev.details, ev.source].map(esc).join(","));
+      });
+    }
+
+    const csv = `${headers.join(",")}\n${rows.join("\n")}\n`;
+    const blob = new Blob([csv], { type:"text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    const safe = (el.date.value || "observation").replace(/[^0-9a-z]+/gi,"_");
+    a.href = url;
+    a.download = `music_lesson_observation_${safe}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+  el.csv.addEventListener("click", downloadCSV);
+
+  // JSON export/import
+  function exportJSON(){
+    if (state.running) stopObservation();
+
+    const payload = {
+      app: "Music Lesson Observation App",
+      developed_by: "Kevin Droe, Ph.D.",
+      version: "1.0",
+      exported_at: new Date().toISOString(),
+      metadata: {
+        observer: el.observer.value.trim(),
+        date: el.date.value,
+        observed_teacher: el.teacher.value.trim(),
+        context: el.context.value.trim(),
+        target_minutes: clamp(parseInt(el.duration.value || "10", 10), 1, 999),
+        mode: el.mode.value,
+        time_source: (el.mode.value === "live") ? "live" : state.videoMode,
+        youtube_url: el.ytUrl.value.trim() || null
+      },
+      category_time_ms: { ...state.catMs },
+      category_starts: { ...state.catStarts },
+      notes: el.notes.value.trim(),
+      events: state.events.slice(),
+      active_category: state.activeId
+    };
+
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type:"application/json;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    const safe = (el.date.value || "observation").replace(/[^0-9a-z]+/gi,"_");
+    a.href = url;
+    a.download = `music_lesson_observation_${safe}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+  el.jsonOut.addEventListener("click", exportJSON);
+
+  el.jsonInBtn.addEventListener("click", () => el.jsonIn.click());
+
+  el.jsonIn.addEventListener("change", async () => {
+    const f = el.jsonIn.files && el.jsonIn.files[0];
+    if (!f) return;
+    try{
+      const text = await f.text();
+      const data = JSON.parse(text);
+
+      if (!data || !data.category_time_ms || !data.category_starts || !data.events) throw new Error("Invalid file");
+
+      el.observer.value = data.metadata?.observer || "";
+      el.date.value = data.metadata?.date || el.date.value;
+      el.teacher.value = data.metadata?.observed_teacher || "";
+      el.context.value = data.metadata?.context || "";
+      el.duration.value = data.metadata?.target_minutes ?? el.duration.value;
+      updateTarget();
+
+      // mode
+      el.mode.value = data.metadata?.mode === "video" ? "video" : "live";
+      applyModeUI();
+
+      // category data
+      for (const c of categories){
+        if (typeof data.category_time_ms[c.id] === "number") state.catMs[c.id] = Math.max(0, data.category_time_ms[c.id]);
+        if (typeof data.category_starts[c.id] === "number") state.catStarts[c.id] = Math.max(0, data.category_starts[c.id]);
+      }
+
+      // notes
+      el.notes.value = data.notes || "";
+
+      // events
+      state.events = Array.isArray(data.events) ? data.events : [];
+
+      // history cleared (safer after import)
+      state.history = [];
+      state.activeId = null;
+      state.activeSincePerf = null;
+      state.activeSinceVideoSec = null;
+
+      // YouTube URL autoload
+      const yt = data.metadata?.youtube_url;
+      if (yt){
+        el.ytUrl.value = yt;
+        el.mode.value = "video";
+        applyModeUI();
+        el.loadYt.click();
+      } else {
+        setTimeout(() => {
+          if (el.mode.value === "video" && state.videoMode === "none"){
+            showYtMsg("Load the same video to enable Jump.");
+          }
+        }, 300);
+      }
+
+      renderTimers();
+      renderLog();
+      el.output.value = "";
+    }catch{
+      alert("Could not import that JSON file.");
+    } finally {
+      el.jsonIn.value = "";
+    }
+  });
+
+  // Keyboard shortcuts
+  window.addEventListener("keydown", (e) => {
+    const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : "";
+    if (tag === "input" || tag === "textarea" || tag === "select") return;
+
+    if (e.code === "Space") { e.preventDefault(); state.running ? stopObservation() : start(); return; }
+    if (e.key === "1") startCategory("studentOnly");
+    if (e.key === "2") startCategory("teacherModeling");
+    if (e.key === "3") startCategory("together");
+    if (e.key === "4") startCategory("talk");
+    if (e.key.toLowerCase() === "z") undoLast();
+    if (e.key.toLowerCase() === "e") exportSummary();
+  });
+
+  // init render
+  renderTimers();
+  renderLog();
+  setModeChip();
+  setSyncChip();
+  setStateChip();
+  setActiveChip();
+  setJumpHelp();
+
+})();
+</script>
+</body>
+</html>
